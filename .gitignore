@@ -1,0 +1,17 @@
+# Ignore local environment configuration
+backend/.env
+frontend/.env
+
+# Node dependencies and lockfile if using Yarn
+frontend/node_modules/
+frontend/package-lock.json
+
+# Python cache
+backend/__pycache__/
+
+# Log files
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
