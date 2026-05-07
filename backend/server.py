@@ -19,9 +19,22 @@ ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
 # MongoDB connection
-mongo_url = os.environ['MONGO_URL']
-client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ['DB_NAME']]
+mongo_url = os.environ.get('MONGO_URL', '')
+db_name = os.environ.get('DB_NAME', 'budget_db')
+
+if not mongo_url:
+    print("WARNING: MONGO_URL environment variable not set!")
+    client = None
+    db = None
+else:
+    try:
+        client = AsyncIOMotorClient(mongo_url)
+        db = client[db_name]
+        print(f"Connected to MongoDB database: {db_name}")
+    except Exception as e:
+        print(f"Failed to connect to MongoDB: {e}")
+        client = None
+        db = None
 
 # Create the main app without a prefix
 app = FastAPI(title="Budget Planner API", version="1.0.0")
@@ -36,7 +49,12 @@ async def root():
 
 @api_router.get("/health")
 async def health_check():
-    return {"status": "healthy", "timestamp": datetime.utcnow()}
+    db_status = "connected" if db is not None else "disconnected"
+    return {
+        "status": "healthy" if db is not None else "degraded",
+        "timestamp": datetime.utcnow(),
+        "database": db_status
+    }
 
 # Include route modules
 app.include_router(budget_router)
