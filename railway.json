@@ -1,6 +1,6 @@
 {
   "build": {
-    "builder": "nixpacks"
+    "builder": "NIXPACKS"
   },
   "deploy": {
     "startCommand": "python backend/server.py"
